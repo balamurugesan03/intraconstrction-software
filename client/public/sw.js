@@ -3,7 +3,7 @@
    - Hashed build files (/assets/*) are cached after first load (their names change on every deploy).
    - Pages are fetched from the network first; the cached app shell is used only when offline. */
 const CACHE = 'intra-erp-v1';
-const scope = new URL(self.registration.scope).pathname; // e.g. /cms/
+const scope = new URL(self.registration.scope).pathname; // e.g. /
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll([scope, `${scope}logo-192.png`])).then(() => self.skipWaiting()));

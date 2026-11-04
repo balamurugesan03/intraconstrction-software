@@ -4,14 +4,6 @@ import { useAuth } from '../context/AuthContext';
 import { Button, Field } from '../components/ui';
 import { errMsg } from '../lib/api';
 import InstallApp from '../components/InstallApp';
-import { cn } from '../lib/format';
-
-const DEMO = [
-  ['Super Admin', 'superadmin@buildpro.in'], ['Project Manager', 'pm@buildpro.in'], ['Site Engineer', 'engineer@buildpro.in'],
-  ['Estimator', 'estimator@buildpro.in'], ['Purchase Manager', 'purchase@buildpro.in'], ['Accountant', 'accounts@buildpro.in'],
-  ['Designer', 'designer@buildpro.in'], ['Store Manager', 'store@buildpro.in'], ['Site Supervisor', 'supervisor@buildpro.in'],
-  ['Contractor', 'contractor@buildpro.in'], ['Worker', 'worker@buildpro.in'], ['Client', 'client@buildpro.in'],
-];
 
 export default function Login() {
   const { login } = useAuth();
@@ -79,20 +71,6 @@ export default function Login() {
             <Button type="submit" size="lg" loading={loading} className="w-full">Sign in <ArrowRight className="size-4" /></Button>
           </form>
           <InstallApp className="mt-3 w-full" />
-
-          {import.meta.env.DEV && (
-          <div className="mt-8">
-            <p className="mb-2 text-xs font-medium text-slate-500">Demo accounts · password <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">password123</code></p>
-            <div className="flex flex-wrap gap-1.5">
-              {DEMO.map(([role, mail]) => (
-                <button key={mail} type="button" onClick={() => { setEmail(mail); setPassword('password123'); }}
-                  className={cn('rounded-md border px-2 py-1 text-xs transition', email === mail ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'border-slate-200 text-slate-600 hover:border-slate-300 dark:border-slate-700 dark:text-slate-400')}>
-                  {role}
-                </button>
-              ))}
-            </div>
-          </div>
-          )}
         </div>
       </div>
     </div>

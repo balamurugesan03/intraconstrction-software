@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 const API = process.env.API_URL || 'http://localhost:5000';
 
 export default defineConfig(({ mode }) => ({
-  // Sub-path the app is served from in production, e.g. /cms/ (see .env.production)
+  // Optional sub-path for production builds (set VITE_BASE_PATH, e.g. /app/); defaults to domain root
   base: mode === 'production' ? loadEnv(mode, process.cwd(), '').VITE_BASE_PATH || '/' : '/',
   plugins: [react(), tailwindcss()],
   server: {

@@ -20,7 +20,7 @@ import hrRoutes from './routes/hr.routes.js';
 import { notFound, errorHandler } from './middleware/error.js';
 
 const isProd = process.env.NODE_ENV === 'production';
-// Sub-path the whole app lives under, e.g. "/cms" for https://www.intrainteriors.co/cms ("" = domain root)
+// Sub-path the whole app lives under, ("" = domain root)
 const BASE = (process.env.BASE_PATH || '').replace(/\/+$/, '');
 
 if (isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.startsWith('change_this'))) {
@@ -46,7 +46,7 @@ app.use(`${BASE}/api`, coreRoutes, salesRoutes, projectRoutes, inventoryRoutes, 
 // Serve the built React app (client/dist) with SPA fallback
 const clientDist = path.resolve('../client/dist');
 if (fs.existsSync(clientDist)) {
-  // "/cms" -> "/cms/" (Express treats both as the same route, so check the raw URL to avoid a loop)
+  // "/base" -> "/base/" (Express treats both as the same route, so check the raw URL to avoid a loop)
   if (BASE) app.get(BASE, (req, res, next) => (req.originalUrl.split('?')[0] === BASE ? res.redirect(301, `${BASE}/`) : next()));
   app.use(BASE || '/', express.static(clientDist, { index: false, maxAge: '30d', setHeaders: (res, file) => /\.(html|webmanifest)$|[\\/]sw\.js$/.test(file) && res.setHeader('Cache-Control', 'no-cache') }));
   app.use(BASE || '/', (req, res, next) => {

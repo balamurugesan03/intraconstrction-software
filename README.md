@@ -8,33 +8,13 @@ Requirements: Node 20+ and MongoDB running locally (`mongodb://127.0.0.1:27017`)
 
 ```bash
 npm run install:all     # installs root, server and client deps
-npm run seed            # loads demo data (wipes the buildpro database)
 npm run reset           # erases all data, keeps Super Admin login(s)
 npm run dev             # API on :5000, web app on http://localhost:5173
 ```
 
-Production (served under `/cms`): see **[DEPLOY.md](DEPLOY.md)** — live at https://www.intrainteriors.co/cms/
 
 Config lives in `server/.env` (copy from `server/.env.example`; **change `JWT_SECRET`**).
 
-### Demo logins (password `password123`)
-
-| Role | Email |
-|---|---|
-| Super Admin | superadmin@buildpro.in |
-| Admin | admin@buildpro.in |
-| Project Manager | pm@buildpro.in |
-| Site Engineer | engineer@buildpro.in |
-| Site Supervisor | supervisor@buildpro.in |
-| Estimator | estimator@buildpro.in |
-| Purchase Manager | purchase@buildpro.in |
-| Accountant | accounts@buildpro.in |
-| Designer | designer@buildpro.in |
-| Store Manager | store@buildpro.in |
-| HR Manager | hr@buildpro.in |
-| Contractor (portal) | contractor@buildpro.in |
-| Worker (portal) | worker@buildpro.in |
-| Client (portal) | client@buildpro.in |
 
 ## Core flow
 
