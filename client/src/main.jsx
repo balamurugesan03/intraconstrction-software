@@ -6,7 +6,10 @@ import { Toaster } from 'sonner';
 import { AuthProvider } from './context/AuthContext';
 import { ConfirmProvider } from './components/ui';
 import App from './App';
+import { registerPWA } from './lib/pwa';
 import './index.css';
+
+registerPWA();
 
 const queryClient = new QueryClient({
   defaultOptions: {

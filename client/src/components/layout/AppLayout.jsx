@@ -7,6 +7,7 @@ import { useApi, useTheme } from '../../lib/hooks';
 import { Avatar, Menu } from '../ui';
 import { cn } from '../../lib/format';
 import CommandPalette from './CommandPalette';
+import InstallApp from '../InstallApp';
 
 function Logo() {
   return (
@@ -104,6 +105,7 @@ export default function AppLayout() {
             <kbd className="hidden rounded border border-slate-200 bg-white px-1.5 text-[10px] font-medium text-slate-500 sm:block dark:border-slate-700 dark:bg-slate-800">Ctrl K</kbd>
           </button>
           <div className="ml-auto flex items-center gap-1">
+            <InstallApp variant="icon" />
             <button onClick={toggle} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900 dark:hover:bg-slate-800 dark:hover:text-white" title="Toggle theme">
               {dark ? <Sun className="size-5" /> : <Moon className="size-5" />}
             </button>

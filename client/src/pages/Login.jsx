@@ -3,6 +3,7 @@ import { ArrowRight, CheckCircle2, Lock, Mail } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Button, Field } from '../components/ui';
 import { errMsg } from '../lib/api';
+import InstallApp from '../components/InstallApp';
 import { cn } from '../lib/format';
 
 const DEMO = [
@@ -77,6 +78,7 @@ export default function Login() {
             {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-500/10 dark:text-red-300">{error}</p>}
             <Button type="submit" size="lg" loading={loading} className="w-full">Sign in <ArrowRight className="size-4" /></Button>
           </form>
+          <InstallApp className="mt-3 w-full" />
 
           {import.meta.env.DEV && (
           <div className="mt-8">

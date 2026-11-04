@@ -1,0 +1,16 @@
+{
+  "name": "Intra Interiors ERP",
+  "short_name": "Intra ERP",
+  "description": "Construction & interior management: projects, sites, stock, billing and HR.",
+  "id": "./",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "icons": [
+    { "src": "logo-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "logo-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

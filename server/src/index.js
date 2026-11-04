@@ -48,7 +48,7 @@ const clientDist = path.resolve('../client/dist');
 if (fs.existsSync(clientDist)) {
   // "/cms" -> "/cms/" (Express treats both as the same route, so check the raw URL to avoid a loop)
   if (BASE) app.get(BASE, (req, res, next) => (req.originalUrl.split('?')[0] === BASE ? res.redirect(301, `${BASE}/`) : next()));
-  app.use(BASE || '/', express.static(clientDist, { index: false, maxAge: '30d', setHeaders: (res, file) => file.endsWith('.html') && res.setHeader('Cache-Control', 'no-cache') }));
+  app.use(BASE || '/', express.static(clientDist, { index: false, maxAge: '30d', setHeaders: (res, file) => /\.(html|webmanifest)$|[\\/]sw\.js$/.test(file) && res.setHeader('Cache-Control', 'no-cache') }));
   app.use(BASE || '/', (req, res, next) => {
     if (req.method !== 'GET' || req.path.startsWith('/api') || req.path.startsWith('/uploads')) return next();
     res.setHeader('Cache-Control', 'no-cache');
