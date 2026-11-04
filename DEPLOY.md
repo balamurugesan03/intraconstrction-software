@@ -1,8 +1,8 @@
-# Deploying to https://unizova.com/cms
+# Deploying to https://www.intrainteriors.co/cms
 
 The app runs as **one Node process** (API + built React app), served under the `/cms` sub-path
 (`BASE_PATH=/cms` on the server, `VITE_BASE_PATH=/cms/` in `client/.env.production`).
-Nginx on unizova.com proxies `/cms/` to it. Your existing site on `/` is untouched.
+Nginx on www.intrainteriors.co proxies `/cms/` to it. Your existing site on `/` is untouched.
 
 ## 1. Server prerequisites (Ubuntu VPS)
 
@@ -34,11 +34,11 @@ curl http://127.0.0.1:5000/cms/api/health                     # -> {"ok":true,"d
 
 ## 3. Nginx
 
-Paste `deploy/nginx-unizova-cms.conf` inside the existing HTTPS `server { … unizova.com … }` block, then:
+Paste `deploy/nginx-intrainteriors-cms.conf` inside the existing HTTPS `server { … intrainteriors.co … }` block, then:
 ```bash
 sudo nginx -t && sudo systemctl reload nginx
 ```
-Open **https://unizova.com/cms/**
+Open **https://www.intrainteriors.co/cms/**
 
 ## 4. Updates
 

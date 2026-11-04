@@ -13,7 +13,7 @@ npm run reset           # erases all data, keeps Super Admin login(s)
 npm run dev             # API on :5000, web app on http://localhost:5173
 ```
 
-Production (served under `/cms`): see **[DEPLOY.md](DEPLOY.md)** — live at https://unizova.com/cms/
+Production (served under `/cms`): see **[DEPLOY.md](DEPLOY.md)** — live at https://www.intrainteriors.co/cms/
 
 Config lives in `server/.env` (copy from `server/.env.example`; **change `JWT_SECRET`**).
 

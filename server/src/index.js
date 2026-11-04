@@ -20,7 +20,7 @@ import hrRoutes from './routes/hr.routes.js';
 import { notFound, errorHandler } from './middleware/error.js';
 
 const isProd = process.env.NODE_ENV === 'production';
-// Sub-path the whole app lives under, e.g. "/cms" for https://unizova.com/cms ("" = domain root)
+// Sub-path the whole app lives under, e.g. "/cms" for https://www.intrainteriors.co/cms ("" = domain root)
 const BASE = (process.env.BASE_PATH || '').replace(/\/+$/, '');
 
 if (isProd && (!process.env.JWT_SECRET || process.env.JWT_SECRET.startsWith('change_this'))) {

@@ -7,4 +7,4 @@ npm --prefix client ci
 npm --prefix client run build          # uses client/.env.production -> base /cms/
 pm2 startOrReload ecosystem.config.cjs --update-env
 pm2 save
-echo "✔ Deployed: https://unizova.com/cms/"
+echo "✔ Deployed: https://www.intrainteriors.co/cms/"
