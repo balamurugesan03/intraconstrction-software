@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 export const api = axios.create({ baseURL: `${import.meta.env.BASE_URL}api` });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
+  const token = sessionStorage.getItem('token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -13,7 +13,7 @@ api.interceptors.response.use(
   (res) => res,
   (err) => {
     if (err.response?.status === 401 && !err.config.url.includes('/auth/login')) {
-      localStorage.removeItem('token');
+      sessionStorage.removeItem('token');
       window.dispatchEvent(new Event('auth:logout'));
     }
     return Promise.reject(err);

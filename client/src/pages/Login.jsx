@@ -14,8 +14,8 @@ const DEMO = [
 
 export default function Login() {
   const { login } = useAuth();
-  const [email, setEmail] = useState('superadmin@buildpro.in');
-  const [password, setPassword] = useState('password123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -78,6 +78,7 @@ export default function Login() {
             <Button type="submit" size="lg" loading={loading} className="w-full">Sign in <ArrowRight className="size-4" /></Button>
           </form>
 
+          {import.meta.env.DEV && (
           <div className="mt-8">
             <p className="mb-2 text-xs font-medium text-slate-500">Demo accounts · password <code className="rounded bg-slate-100 px-1 dark:bg-slate-800">password123</code></p>
             <div className="flex flex-wrap gap-1.5">
@@ -89,6 +90,7 @@ export default function Login() {
               ))}
             </div>
           </div>
+          )}
         </div>
       </div>
     </div>

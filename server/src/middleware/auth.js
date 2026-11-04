@@ -3,7 +3,7 @@ import { User } from '../models/index.js';
 import { hasPermission } from '../config/permissions.js';
 
 export const signToken = (user) =>
-  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '7d' });
+  jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRES || '12h' });
 
 export async function protect(req, res, next) {
   const header = req.headers.authorization || '';
