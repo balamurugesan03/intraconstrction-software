@@ -2,7 +2,7 @@
 module.exports = {
   apps: [
     {
-      name: 'buildpro-cms',
+      name: 'intrainteriors-cms',
       cwd: './server',
       script: 'src/index.js',
       instances: 1,
