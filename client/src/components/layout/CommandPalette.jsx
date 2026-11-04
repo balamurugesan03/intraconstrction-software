@@ -28,14 +28,14 @@ export default function CommandPalette({ open, onClose }) {
   const search = (url, mod) => ({
     queryKey: ['palette', url, dq],
     queryFn: () => get(url, { q: dq, limit: 5 }),
-    enabled: enabled && can(mod),
+    enabled: enabled && can(mod, 'menu'),
   });
   const { data: projects } = useQuery(search('/projects', 'projects'));
   const { data: clients } = useQuery(search('/clients', 'clients'));
   const { data: quotes } = useQuery(search('/quotations', 'quotations'));
 
   const items = useMemo(() => {
-    const pages = NAV.flatMap((g) => g.items.filter((i) => can(i.module)).map((i) => ({ label: i.label, hint: g.group, icon: i.icon, to: i.to })))
+    const pages = NAV.flatMap((g) => g.items.filter((i) => can(i.module, 'menu')).map((i) => ({ label: i.label, hint: g.group, icon: i.icon, to: i.to })))
       .filter((p) => !q || p.label.toLowerCase().includes(q.toLowerCase()));
     return [
       ...pages,

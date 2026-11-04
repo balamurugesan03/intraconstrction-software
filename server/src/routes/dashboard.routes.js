@@ -1,5 +1,6 @@
 import express from 'express';
 import { guard } from '../middleware/auth.js';
+import { hasPermission } from '../config/permissions.js';
 import { visibleProjectIds } from '../services/scope.js';
 import { projectFinancials, finFor, totalsOf } from '../services/finance.js';
 import { stockLevels } from '../services/stock.js';
@@ -71,26 +72,31 @@ router.get('/dashboard', guard('dashboard'), async (req, res) => {
     lowStock = materials.filter((m) => (tot.get(String(m._id)) || 0) < m.minStock).length;
   }
 
+  // Money figures only for roles that work with finance (accounts, PM, admins; billed portal users).
+  const finance = hasPermission(req.user.role, external ? 'bills' : 'payments');
+  const money = (v) => (finance ? v : undefined);
+
   res.json({
+    finance,
     kpis: {
       totalProjects: projects.length,
       ...status,
       avgProgress: active.length ? Math.round(active.reduce((s, p) => s + (p.progress || 0), 0) / active.length) : 0,
-      contractValue,
-      received: totals.received,
-      pending: round2(contractValue - totals.received),
-      billed: totals.billed,
-      material: totals.material,
-      labour: totals.labour,
-      subcontract: totals.subcontract,
-      expenses: totals.expenses,
-      totalCost: totals.totalCost,
-      profit: round2(totals.billed - totals.totalCost),
-      lowStock,
+      contractValue: money(contractValue),
+      received: money(totals.received),
+      pending: money(round2(contractValue - totals.received)),
+      billed: money(totals.billed),
+      material: money(totals.material),
+      labour: money(totals.labour),
+      subcontract: money(totals.subcontract),
+      expenses: money(totals.expenses),
+      totalCost: money(totals.totalCost),
+      profit: money(round2(totals.billed - totals.totalCost)),
+      lowStock: hasPermission(req.user.role, 'stock') ? lowStock : undefined,
     },
     projectStatus: Object.entries(status).map(([name, value]) => ({ name, value })),
     taskStatus: taskStatus.map((t) => ({ name: t._id, value: t.count })),
-    cashflow: months,
+    cashflow: finance ? months : [],
     upcomingTasks,
     overdueTasks,
     recentReports,
@@ -106,11 +112,11 @@ router.get('/dashboard', guard('dashboard'), async (req, res) => {
         status: p.status,
         progress: p.progress,
         endDate: p.endDate,
-        contractValue: p.contractValue,
-        budget: p.budget,
-        cost: f.totalCost,
-        received: f.received,
-        billed: f.billed,
+        contractValue: money(p.contractValue),
+        budget: money(p.budget),
+        cost: money(f.totalCost),
+        received: money(f.received),
+        billed: money(f.billed),
       };
     }),
   });

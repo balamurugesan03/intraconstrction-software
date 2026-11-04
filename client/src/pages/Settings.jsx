@@ -34,7 +34,7 @@ export default function Settings() {
     }
   };
 
-  const modules = NAV.flatMap((g) => g.items).filter((i) => i.module && can(i.module));
+  const modules = NAV.flatMap((g) => g.items).filter((i) => i.module && can(i.module, 'menu'));
 
   return (
     <div className="mx-auto max-w-5xl space-y-6">

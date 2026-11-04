@@ -22,7 +22,7 @@ function Logo() {
 
 function Sidebar({ onNavigate }) {
   const { can, user } = useAuth();
-  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => can(i.module)) })).filter((g) => g.items.length);
+  const groups = NAV.map((g) => ({ ...g, items: g.items.filter((i) => can(i.module, 'menu')) })).filter((g) => g.items.length);
   return (
     <div className="flex h-full flex-col bg-gradient-to-b from-neutral-950 via-[#0d0b07] to-neutral-950 border-r border-brand-900/40">
       <div className="flex h-24 shrink-0 items-center border-b border-brand-400/10 px-5"><Logo /></div>

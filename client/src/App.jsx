@@ -35,7 +35,7 @@ const MyHR = lazy(() => import('./pages/MyHR'));
 
 function Guard({ module, children }) {
   const { can } = useAuth();
-  if (module && !can(module)) {
+  if (module && !can(module, 'menu')) {
     return <EmptyState icon={ShieldOff} title="No access" description="Your role does not have permission to view this module." action={<Button to="/">Go to dashboard</Button>} />;
   }
   return children;

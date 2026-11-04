@@ -2,8 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, PieChart, Pie, Cell, Legend } from 'recharts';
 import {
   FolderKanban, Activity, CheckCircle2, PauseCircle, IndianRupee, Wallet, Hourglass, Package, HardHat, TrendingUp,
-  TrendingDown, AlertTriangle, CalendarClock, ClipboardList, ArrowRight, Boxes, Briefcase,
+  TrendingDown, AlertTriangle, CalendarClock, ClipboardList, ArrowRight, Boxes, Briefcase, LayoutGrid,
 } from 'lucide-react';
+import { NAV } from '../config/nav';
 import { useApi } from '../lib/hooks';
 import { useAuth } from '../context/AuthContext';
 import { Card, CardHeader, PageHeader, StatCard, Progress, StatusBadge, PageLoader, EmptyState, Avatar, Button } from '../components/ui';
@@ -51,6 +52,24 @@ function TaskList({ tasks, overdue }) {
   );
 }
 
+function QuickAccess({ can }) {
+  const items = NAV.flatMap((g) => g.items).filter((i) => i.module && i.module !== "dashboard" && can(i.module, "menu"));
+  if (!items.length) return null;
+  return (
+    <Card>
+      <CardHeader title="Your modules" subtitle="Everything available to your role" icon={LayoutGrid} />
+      <div className="grid grid-cols-2 gap-3 p-5 sm:grid-cols-3 xl:grid-cols-6">
+        {items.map((i) => (
+          <Link key={i.to} to={i.to} className="flex items-center gap-2.5 rounded-lg border border-slate-200 px-3 py-3 text-sm font-medium transition hover:border-brand-400 hover:bg-brand-50/40 dark:border-slate-800 dark:hover:bg-slate-800/40">
+            <i.icon className="size-4 shrink-0 text-brand-500" />
+            <span className="truncate">{i.label}</span>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+}
+
 export default function Dashboard() {
   const { user, isExternal, can } = useAuth();
   const nav = useNavigate();
@@ -58,6 +77,11 @@ export default function Dashboard() {
   if (isLoading || !data) return <PageLoader />;
   const k = data.kpis;
   const profitUp = k.profit >= 0;
+  const fin = !!data.finance;
+  const showProjects = can("projects", "menu");
+  const showStock = k.lowStock !== undefined && can("stock", "menu");
+  const showTasks = can("tasks", "menu");
+  const showReports = can("dailyReports", "menu");
 
   return (
     <div className="space-y-6">
@@ -67,17 +91,25 @@ export default function Dashboard() {
         actions={!isExternal && can('leads', 'edit') && <><Button variant="secondary" to="/workflow">View business flow</Button><Button to="/leads?create=1">New lead</Button></>}
       />
 
+      {/* Quick access to the modules of this role (the only content for roles without projects, e.g. HR) */}
+      {!showProjects && <QuickAccess can={can} />}
+
       {/* KPI row 1: projects */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
-        <StatCard label="Total Projects" value={k.totalProjects} icon={FolderKanban} tone="slate" to="/projects" />
-        <StatCard label="Ongoing" value={k.Ongoing} icon={Activity} tone="blue" to="/projects?status=Ongoing" />
-        <StatCard label="Completed" value={k.Completed} icon={CheckCircle2} tone="green" to="/projects?status=Completed" />
-        <StatCard label="On Hold" value={k['On Hold']} icon={PauseCircle} tone="amber" to="/projects?status=On Hold" />
-        <StatCard label="Avg. Progress" value={`${k.avgProgress}%`} icon={TrendingUp} tone="violet" />
-        <StatCard label="Total Project Value" value={moneyShort(k.contractValue)} icon={IndianRupee} tone="brand" hint={money(k.contractValue)} />
-      </div>
+      {showProjects && (
+        <div className="grid grid-cols-2 gap-3 md:grid-cols-3 xl:grid-cols-6">
+          <StatCard label="Total Projects" value={k.totalProjects} icon={FolderKanban} tone="slate" to="/projects" />
+          <StatCard label="Ongoing" value={k.Ongoing} icon={Activity} tone="blue" to="/projects?status=Ongoing" />
+          <StatCard label="Completed" value={k.Completed} icon={CheckCircle2} tone="green" to="/projects?status=Completed" />
+          <StatCard label="On Hold" value={k['On Hold']} icon={PauseCircle} tone="amber" to="/projects?status=On Hold" />
+          <StatCard label="Avg. Progress" value={`${k.avgProgress}%`} icon={TrendingUp} tone="violet" />
+          {fin
+            ? <StatCard label="Total Project Value" value={moneyShort(k.contractValue)} icon={IndianRupee} tone="brand" hint={money(k.contractValue)} />
+            : showStock && <StatCard label="Low-stock Items" value={k.lowStock} icon={Boxes} tone={k.lowStock ? 'red' : 'slate'} to="/inventory/stock" />}
+        </div>
+      )}
 
       {/* KPI row 2: money */}
+      {fin && (
       <div className={cn('grid grid-cols-2 gap-3 md:grid-cols-3', isExternal ? 'xl:grid-cols-3' : 'xl:grid-cols-6')}>
         <StatCard label="Payment Received" value={moneyShort(k.received)} icon={Wallet} tone="green" hint={`${k.contractValue ? Math.round((k.received / k.contractValue) * 100) : 0}% of value`} />
         <StatCard label="Pending Payment" value={moneyShort(k.pending)} icon={Hourglass} tone="amber" hint={`Billed ${moneyShort(k.billed)}`} />
@@ -86,13 +118,16 @@ export default function Dashboard() {
             <StatCard label="Material Purchase" value={moneyShort(k.material)} icon={Package} tone="blue" to={can('reports') ? '/reports?r=material-consumption' : undefined} />
             <StatCard label="Labour Cost" value={moneyShort(k.labour)} icon={HardHat} tone="cyan" hint={`+ Subcontract ${moneyShort(k.subcontract)}`} />
             <StatCard label="Profit / Loss" value={moneyShort(k.profit)} icon={profitUp ? TrendingUp : TrendingDown} tone={profitUp ? 'green' : 'red'} hint={`Billed − cost (${moneyShort(k.totalCost)})`} />
-            <StatCard label="Low-stock Items" value={k.lowStock} icon={Boxes} tone={k.lowStock ? 'red' : 'slate'} to="/inventory/stock" />
+            {showStock && <StatCard label="Low-stock Items" value={k.lowStock} icon={Boxes} tone={k.lowStock ? 'red' : 'slate'} to="/inventory/stock" />}
           </>
         )}
         {isExternal && <StatCard label="Billed to date" value={moneyShort(k.billed)} icon={Briefcase} tone="blue" />}
       </div>
+      )}
 
+      {showProjects && (
       <div className="grid gap-6 xl:grid-cols-3">
+        {fin && (
         <Card className="xl:col-span-2">
           <CardHeader title="Cash flow" subtitle="Money in vs money out · last 6 months" icon={IndianRupee} />
           <div className="h-72 p-4">
@@ -109,7 +144,8 @@ export default function Dashboard() {
             </ResponsiveContainer>
           </div>
         </Card>
-        <Card>
+        )}
+        <Card className={fin ? undefined : 'xl:col-span-3'}>
           <CardHeader title="Project status" subtitle={`${k.totalProjects} projects`} icon={FolderKanban} />
           <div className="relative h-52">
             <ResponsiveContainer>
@@ -136,19 +172,22 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+      )}
 
       {/* Site-wise summary */}
+      {showProjects && (
       <Card className="overflow-hidden">
-        <CardHeader title="Site-wise summary" subtitle="Progress, value and spend per project" icon={Activity} action={<Button variant="ghost" size="sm" to="/projects">All projects <ArrowRight className="size-3.5" /></Button>} />
+        <CardHeader title="Site-wise summary" subtitle={fin ? "Progress, value and spend per project" : "Progress per project"} icon={Activity} action={<Button variant="ghost" size="sm" to="/projects">All projects <ArrowRight className="size-3.5" /></Button>} />
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-slate-50/70 dark:bg-slate-800/30">
               <tr>
                 <th className="th">Project</th><th className="th">Status</th><th className="th">Progress</th>
-                <th className="th text-right">Value</th>
-                {!isExternal && <th className="th text-right">Cost</th>}
-                {!isExternal && <th className="th">Budget used</th>}
-                <th className="th text-right">Received</th><th className="th">Due</th>
+                {fin && <th className="th text-right">Value</th>}
+                {fin && !isExternal && <th className="th text-right">Cost</th>}
+                {fin && !isExternal && <th className="th">Budget used</th>}
+                {fin && <th className="th text-right">Received</th>}
+                <th className="th">Due</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -159,10 +198,10 @@ export default function Dashboard() {
                     <td className="td"><p className="font-medium text-slate-900 dark:text-white">{s.name}</p><p className="text-xs text-slate-500">{s.code} · {s.client}</p></td>
                     <td className="td"><StatusBadge value={s.status} /></td>
                     <td className="td"><Progress value={s.progress} className="w-32" size="sm" /></td>
-                    <td className="td text-right tabular-nums">{moneyShort(s.contractValue)}</td>
-                    {!isExternal && <td className="td text-right tabular-nums">{moneyShort(s.cost)}</td>}
-                    {!isExternal && <td className="td"><Progress value={used} className="w-28" size="sm" tone={used > 100 ? 'bg-red-500' : used > 85 ? 'bg-amber-500' : 'bg-emerald-500'} /></td>}
-                    <td className="td text-right tabular-nums">{moneyShort(s.received)}</td>
+                    {fin && <td className="td text-right tabular-nums">{moneyShort(s.contractValue)}</td>}
+                    {fin && !isExternal && <td className="td text-right tabular-nums">{moneyShort(s.cost)}</td>}
+                    {fin && !isExternal && <td className="td"><Progress value={used} className="w-28" size="sm" tone={used > 100 ? 'bg-red-500' : used > 85 ? 'bg-amber-500' : 'bg-emerald-500'} /></td>}
+                    {fin && <td className="td text-right tabular-nums">{moneyShort(s.received)}</td>}
                     <td className="td text-slate-500">{fmtDate(s.endDate)}</td>
                   </tr>
                 );
@@ -172,8 +211,12 @@ export default function Dashboard() {
           {!data.sites.length && <EmptyState title="No projects yet" />}
         </div>
       </Card>
+      )}
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      {(showTasks || showReports) && (
+      <div className={cn("grid gap-6", showTasks && showReports ? "lg:grid-cols-3" : showTasks ? "lg:grid-cols-2" : "")}>
+        {showTasks && (
+        <>
         <Card>
           <CardHeader title="Overdue tasks" subtitle={`${data.overdueTasks.length} need attention`} icon={AlertTriangle} />
           <TaskList tasks={data.overdueTasks} overdue />
@@ -182,6 +225,9 @@ export default function Dashboard() {
           <CardHeader title="Upcoming tasks" subtitle="Due in the next 7 days" icon={CalendarClock} />
           <TaskList tasks={data.upcomingTasks} />
         </Card>
+        </>
+        )}
+        {showReports && (
         <Card>
           <CardHeader title="Latest site reports" icon={ClipboardList} />
           {data.recentReports.length ? (
@@ -200,7 +246,9 @@ export default function Dashboard() {
             </ul>
           ) : <EmptyState title="No reports yet" className="py-8" />}
         </Card>
+        )}
       </div>
+      )}
     </div>
   );
 }

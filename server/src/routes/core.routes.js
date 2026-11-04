@@ -6,7 +6,7 @@ import { crud } from '../utils/crud.js';
 import { protect, signToken, guard, allowRoles } from '../middleware/auth.js';
 import { User, Setting } from '../models/index.js';
 import { ApiError } from '../utils/helpers.js';
-import { PERMISSIONS, ROLES } from '../config/permissions.js';
+import { ROLES, accessFor } from '../config/permissions.js';
 
 const router = express.Router();
 
@@ -24,7 +24,7 @@ router.post('/auth/login', async (req, res) => {
 
 router.use(protect);
 
-router.get('/auth/me', (req, res) => res.json({ user: req.user, permissions: PERMISSIONS, roles: ROLES }));
+router.get('/auth/me', (req, res) => res.json({ user: req.user, access: accessFor(req.user.role), roles: ROLES }));
 
 router.put('/auth/me', async (req, res) => {
   const { name, phone, designation } = req.body;
