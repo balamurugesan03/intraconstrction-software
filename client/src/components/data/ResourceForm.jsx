@@ -20,20 +20,25 @@ function toFormValue(field, raw) {
   return raw ?? (field.type === 'checkbox' ? false : '');
 }
 
-function toPayload(field, v) {
-  if (['ref', 'date', 'number', 'currency', 'percent'].includes(field.type) && v === '') return null;
+// Blank optional dropdowns must not reach the server as '' (an invalid enum value): on create they are
+// left out so the model default applies, on edit they are cleared with null.
+function toPayload(field, v, isNew) {
+  if (field.type === 'select' && v === '') return isNew ? undefined : null;
+  if (['ref', 'date', 'number', 'currency', 'percent', 'month'].includes(field.type) && v === '') return null;
   if (field.type === 'items') {
     return (v || []).map((row) => {
       const out = { ...row };
       for (const c of field.columns) {
         if (c.computed) continue;
-        out[c.name] = toPayload(c, row[c.name]);
+        out[c.name] = toPayload(c, row[c.name], isNew);
       }
       return out;
     });
   }
   return v;
 }
+
+const isRequired = (f, isNew) => f.required || (isNew && f.requiredOnCreate);
 
 export function buildInitial(fields, record, defaults = {}) {
   const v = {};
@@ -44,12 +49,13 @@ export function buildInitial(fields, record, defaults = {}) {
   return v;
 }
 
-export function buildPayload(fields, values, hidden = {}) {
+export function buildPayload(fields, values, hidden = {}, isNew = false) {
   const out = { ...hidden };
   for (const f of fields) {
     if (f.showIf && !f.showIf(values)) continue;
     if (f.readOnly) continue;
-    out[f.name] = toPayload(f, values[f.name]);
+    const v = toPayload(f, values[f.name], isNew);
+    if (v !== undefined) out[f.name] = v;
   }
   return out;
 }
@@ -87,11 +93,11 @@ export default function ResourceForm({ id = 'resource-form', fields, record, def
     const errs = {};
     for (const f of visible) {
       const v = values[f.name];
-      if (f.required && (v === '' || v == null || (Array.isArray(v) && !v.length))) errs[f.name] = `${f.label} is required`;
+      if (isRequired(f, !record) && (v === '' || v == null || (Array.isArray(v) && !v.length))) errs[f.name] = `${f.label} is required`;
     }
     setErrors(errs);
     if (Object.keys(errs).length) return;
-    onSubmit(buildPayload(fields, values, hidden), values);
+    onSubmit(buildPayload(fields, values, hidden, !record), values);
   };
 
   const sum = summary?.({ ...hidden, ...values });
@@ -103,7 +109,7 @@ export default function ResourceForm({ id = 'resource-form', fields, record, def
           {sec.name && <h4 className="mb-3 text-xs font-semibold tracking-wider text-slate-400 uppercase">{sec.name}</h4>}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {sec.fields.map((f) => (
-              <Field key={f.name} label={f.type === 'items' ? null : f.label} required={f.required} error={errors[f.name]} hint={f.help} className={cn((f.span === 2 || ['items', 'textarea', 'files'].includes(f.type)) && 'sm:col-span-2')}>
+              <Field key={f.name} label={f.type === 'items' ? null : f.label} required={isRequired(f, !record)} error={errors[f.name]} hint={f.help} className={cn((f.span === 2 || ['items', 'textarea', 'files'].includes(f.type)) && 'sm:col-span-2')}>
                 {f.type === 'items' ? (
                   <>
                     <div className="mb-2 flex items-center justify-between"><span className="label !mb-0">{f.label}</span></div>

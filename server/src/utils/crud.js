@@ -17,6 +17,16 @@ export const clean = (body = {}, extra = []) => {
   return out;
 };
 
+/** A blank dropdown arrives as '' — not a valid enum value. Drop it on create (model default applies), clear it on edit. */
+const blankEnums = (Model, body, isNew) => {
+  for (const [k, v] of Object.entries(body)) {
+    if (v !== '' || !Model.schema.path(k)?.enumValues?.length) continue;
+    if (isNew) delete body[k];
+    else body[k] = null;
+  }
+  return body;
+};
+
 const applyPopulate = (q, populate) => {
   for (const p of populate) q = q.populate(p);
   return q;
@@ -106,7 +116,7 @@ export function crud(Model, options = {}) {
   });
 
   router.post('/', async (req, res) => {
-    let body = clean(req.body);
+    let body = blankEnums(Model, clean(req.body), true);
     if (sanitize) body = (await sanitize(body, req, true)) || body;
     const doc = new Model(body);
     if (beforeSave) await beforeSave(doc, req, true);
@@ -117,7 +127,7 @@ export function crud(Model, options = {}) {
 
   router.put('/:id', async (req, res) => {
     const doc = await findScoped(req);
-    let body = clean(req.body);
+    let body = blankEnums(Model, clean(req.body), false);
     if (sanitize) body = (await sanitize(body, req, false)) || body;
     doc.set(body);
     if (beforeSave) await beforeSave(doc, req, false);
