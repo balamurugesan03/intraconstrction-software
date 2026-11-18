@@ -40,7 +40,8 @@ export const LEAVE_STATUS = ['Pending', 'Approved', 'Rejected', 'Cancelled'];
 export const PAYROLL_STATUS = ['Draft', 'Approved', 'Paid'];
 export const ROLES = [
   'Super Admin', 'Admin', 'Project Manager', 'Site Engineer', 'Site Supervisor', 'Estimator', 'Purchase Manager',
-  'Accountant', 'Designer', 'Store Manager', 'HR Manager', 'Contractor', 'Worker', 'Client',
+  'Accountant', 'Designer', 'Store Manager', 'HR Manager',
+  'Customer Relationship Executive', 'Marketing Promoter', 'Sales Executive', 'Contractor', 'Worker', 'Client',
 ];
 
 /** Tone for every status value used across modules */

@@ -10,6 +10,9 @@ export const ROLES = [
   'Designer',
   'Store Manager',
   'HR Manager',
+  'Customer Relationship Executive',
+  'Marketing Promoter',
+  'Sales Executive',
   'Contractor',
   'Worker',
   'Client',
@@ -26,27 +29,30 @@ const ACC = 'Accountant';
 const DES = 'Designer';
 const STO = 'Store Manager';
 const HR = 'HR Manager';
+const CRE = 'Customer Relationship Executive';
+const MKT = 'Marketing Promoter';
+const SAL = 'Sales Executive';
 const CON = 'Contractor';
 const WRK = 'Worker';
 const CLI = 'Client';
-const STAFF = [PM, SE, SS, EST, PUR, ACC, DES, STO, HR];
+const STAFF = [PM, SE, SS, EST, PUR, ACC, DES, STO, HR, CRE, MKT, SAL];
 
 // API data access per module. Super Admin has full access; Admin has everything except Users & Roles.
 // Which modules appear in each role's sidebar is decided separately by ROLE_MENU below.
 export const PERMISSIONS = {
   dashboard: { view: [...STAFF, CON, WRK, CLI], edit: [] },
-  pipeline: { view: [PM, EST, ACC, DES], edit: [] },
+  pipeline: { view: [PM, EST, ACC, DES, CRE, SAL], edit: [] },
   users: { view: [], edit: [] },
-  leads: { view: [PM, EST, DES], edit: [PM, EST] },
-  activities: { view: [PM, EST, DES, ACC], edit: [PM, EST, DES] },
-  clients: { view: [PM, EST, ACC, DES, SE], edit: [PM, EST, ACC] },
-  siteVisits: { view: [PM, EST, SE, DES], edit: [PM, EST, SE, DES] },
+  leads: { view: [PM, EST, DES, CRE, MKT, SAL], edit: [PM, EST, CRE, MKT, SAL] },
+  activities: { view: [PM, EST, DES, ACC, CRE, MKT, SAL], edit: [PM, EST, DES, CRE, MKT, SAL] },
+  clients: { view: [PM, EST, ACC, DES, SE, CRE, SAL], edit: [PM, EST, ACC, CRE, SAL] },
+  siteVisits: { view: [PM, EST, SE, DES, CRE, SAL], edit: [PM, EST, SE, DES, CRE, SAL] },
   boq: { view: [PM, EST, ACC], edit: [PM, EST] },
-  quotations: { view: [PM, EST, ACC, CLI], edit: [PM, EST] },
+  quotations: { view: [PM, EST, ACC, CLI, CRE, SAL], edit: [PM, EST] },
   projects: { view: [...STAFF, CON, CLI], edit: [PM] },
   tasks: { view: [PM, SE, SS, DES, CON, WRK], edit: [PM, SE, SS] },
-  dailyReports: { view: [PM, SE, SS, ACC, CLI], edit: [PM, SE, SS] },
-  tickets: { view: [PM, SE, SS, DES, CLI], edit: [PM, SE, SS, CLI] },
+  dailyReports: { view: [PM, SE, SS, ACC, CLI, CRE], edit: [PM, SE, SS] },
+  tickets: { view: [PM, SE, SS, DES, CLI, CRE], edit: [PM, SE, SS, CLI, CRE] },
   rooms: { view: [PM, DES, SE, EST, CLI], edit: [PM, DES] },
   documents: { view: [...STAFF, CLI, CON], edit: [...STAFF] },
   materials: { view: [PM, SE, SS, EST, PUR, STO, ACC], edit: [PUR, STO] },
@@ -111,6 +117,18 @@ export const ROLE_MENU = {
   [DES]: ['dashboard', 'leads', 'activities', 'clients', 'siteVisits', 'projects', 'tasks', 'rooms', 'documents', 'tickets', 'leaves'],
   [STO]: ['dashboard', 'projects', 'stock', 'materialRequests', 'purchaseOrders', 'vendors', 'materials', 'reports', 'leaves'],
   [HR]: ['dashboard', 'employees', 'staffAttendance', 'leaves', 'payroll', 'advances'],
+  // Customer Relationship Executive: owns the client relationship from enquiry to handover and after-sales tickets.
+  [CRE]: [
+    'dashboard', 'pipeline', 'leads', 'activities', 'clients', 'siteVisits', 'quotations',
+    'projects', 'dailyReports', 'documents', 'tickets', 'leaves',
+  ],
+  // Marketing Promoter: generates and follows up new leads.
+  [MKT]: ['dashboard', 'leads', 'activities', 'documents', 'leaves'],
+  // Sales Executive: converts leads into clients and follows quotations through to closure.
+  [SAL]: [
+    'dashboard', 'pipeline', 'leads', 'activities', 'clients', 'siteVisits', 'quotations',
+    'projects', 'documents', 'leaves',
+  ],
   [CON]: ['dashboard', 'projects', 'tasks', 'workOrders', 'measurements', 'bills', 'documents'],
   [WRK]: ['dashboard', 'tasks'],
   [CLI]: ['dashboard', 'projects', 'quotations', 'dailyReports', 'rooms', 'documents', 'measurements', 'bills', 'tickets'],
